@@ -1,0 +1,21 @@
+{
+  "name": "Quang.LiveOps.DailyGift.Tests",
+  "references": [
+    "Quang.LiveOps.DailyGift",
+    "Quang.Base",
+    "Quang.Persistence",
+    "Quang.Data",
+    "Quang.DesignPattern",
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner"
+  ],
+  "includePlatforms": ["Editor"],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": ["nunit.framework.dll"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

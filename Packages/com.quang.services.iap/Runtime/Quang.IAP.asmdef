@@ -1,0 +1,24 @@
+{
+    "name": "Quang.IAP",
+    "rootNamespace": "Quang.IAP",
+    "references": [
+        "Quang.Base",
+        "Quang.Persistence",
+        "Quang.DesignPattern",
+        "Quang.Data",
+        "Unity.Purchasing",
+        "Unity.Purchasing.Security",
+        "Unity.Purchasing.SecurityStub",
+        "Unity.Purchasing.SecurityCore",
+        "Quang.Utilities"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

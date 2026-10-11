@@ -1,0 +1,47 @@
+using System;
+using UnityEngine;
+
+namespace Quang.AutoTest
+{
+    [Serializable]
+    public sealed class AutoTestFailure
+    {
+        public string category;
+        public string assertionId;
+        public string message;
+        public string stackTrace;
+        public AutoTestAssertionSeverity severity;
+        public float realtime;
+        public float elapsed;
+        public int frame;
+
+        /// <summary>Game-state snapshot summary captured the moment the failure was recorded — root-cause triage context.</summary>
+        public string contextSummary;
+
+        /// <summary>Optional assertion-supplied evidence (e.g. compact JSON of observed vs expected state).</summary>
+        public string evidence;
+
+        public static AutoTestFailure Create(
+            string category,
+            string assertionId,
+            string message,
+            AutoTestAssertionSeverity severity,
+            AutoTestContext context,
+            string stackTrace = null,
+            string evidence = null)
+        {
+            return new AutoTestFailure
+            {
+                category = category,
+                assertionId = assertionId,
+                message = message,
+                stackTrace = stackTrace ?? string.Empty,
+                severity = severity,
+                realtime = Time.realtimeSinceStartup,
+                elapsed = context != null ? context.ElapsedSeconds : 0f,
+                frame = Time.frameCount,
+                evidence = evidence ?? string.Empty
+            };
+        }
+    }
+}

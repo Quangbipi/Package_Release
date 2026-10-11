@@ -1,0 +1,31 @@
+using Quang.DesignPattern;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Quang.Utilities.Timer;
+
+namespace Quang.Utilities
+{
+    public class VFXObject : GameUnit
+    {
+        [SerializeField]
+        VFXColor vfxColor;
+        [SerializeField]
+        ParticleSystem mainPs;
+
+        public ParticleSystem MainPs => mainPs;
+        public VFXColor VfxColor => vfxColor;
+
+        public void Play()
+        {
+            gameObject.SetActive(true);
+            mainPs.Play();
+            TimerManager.Ins.WaitForTime(mainPs.main.duration, () => DespawnVFX(this));
+        }
+        private void DespawnVFX(VFXObject vfx)
+        {
+            vfx.gameObject.SetActive(false);
+            SimplePool.Despawn(vfx);
+        }
+    }
+}

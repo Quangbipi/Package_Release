@@ -1,0 +1,19 @@
+{
+    "name": "Quang.Analytics.Editor",
+    "rootNamespace": "Quang.Analytics.Editor",
+    "references": [
+        "Quang.Analytics",
+        "Quang.Base"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

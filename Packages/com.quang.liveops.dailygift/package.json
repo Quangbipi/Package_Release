@@ -1,0 +1,24 @@
+{
+  "name": "com.quang.liveops.dailygift",
+  "version": "0.4.8",
+  "displayName": "Quang LiveOps DailyGift",
+  "description": "Daily gift LiveOps feature: manager, popups, install prefab. Contracts live in com.quang.base, data models in com.quang.data.",
+  "unity": "2022.3",
+  "keywords": [
+    "layer:4",
+    "liveops"
+  ],
+  "dependencies": {
+    "com.quang.designpattern": "0.4.5",
+    "com.quang.base": "0.26.0",
+    "com.quang.data": "0.12.6",
+    "com.quang.ui": "0.8.0"
+  },
+  "samples": [
+    {
+      "displayName": "DailyGift",
+      "description": "Install prefab + wiring guide",
+      "path": "Samples~"
+    }
+  ]
+}

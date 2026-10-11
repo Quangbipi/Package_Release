@@ -1,0 +1,22 @@
+{
+    "name": "Quang.Base",
+    "rootNamespace": "Quang.Base",
+    "references": [
+        "Quang.Persistence",
+        "Quang.Utilities.STimer",
+        "Quang.Utilities",
+        "Quang.DesignPattern",
+        "Unity.TextMeshPro",
+        "spine-unity",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

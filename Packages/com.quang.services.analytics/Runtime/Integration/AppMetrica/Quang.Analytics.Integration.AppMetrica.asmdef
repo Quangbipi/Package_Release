@@ -1,0 +1,20 @@
+{
+    "name": "Quang.Analytics.Integration.AppMetrica",
+    "rootNamespace": "Quang.Analytics.Backends",
+    "references": [
+        "Quang.Analytics",
+        "Quang.Base",
+        "AppMetrica"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "QUANG_ANALYTICS_APPMETRICA"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

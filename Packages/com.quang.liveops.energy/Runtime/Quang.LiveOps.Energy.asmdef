@@ -1,0 +1,16 @@
+{
+    "name": "Quang.LiveOps.Energy",
+    "rootNamespace": "Quang.LiveOps.Energy",
+    "references": [
+        "Quang.Base"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

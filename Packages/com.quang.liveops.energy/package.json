@@ -1,0 +1,14 @@
+{
+  "name": "com.quang.liveops.energy",
+  "version": "0.2.8",
+  "displayName": "Quang LiveOps Energy",
+  "description": "Transaction-safe Energy (lives) LiveOps feature: copy-on-write persistence, idempotent grants, and durable run reservations. New package identity replacing com.quang.liveops.heart (no save migration).",
+  "unity": "2022.3",
+  "keywords": [
+    "layer:4",
+    "liveops"
+  ],
+  "dependencies": {
+    "com.quang.base": "0.26.0"
+  }
+}

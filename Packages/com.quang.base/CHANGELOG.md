@@ -1,0 +1,160 @@
+# Changelog
+
+## [0.26.0] - 2026-09-30
+### Added
+- `IAdsEntitlements` (`IsRemoveAds`, `IsPremiumRemoveAds`, `LevelIndex`), `NullAdsEntitlements`, and the `Locator.AdsEntitlements` slot: the host tells the ads module about remove-ads and progression without the ads module reading `GameData`.
+
+## [0.25.0] - 2026-09-29
+### Changed (breaking)
+- `IAnalyticsService`: added `LogEvent(name, AnalyticsCategory, parameters)` and `SetUserProperty`; `LevelTrackEvent(state, level, stars, firstPass, isFtu)`; removed `GoogleFireBaseTrackEvent`, `AppsFlyerTrackParamEvent`, `FireUserProps`, `Day`.
+### Added
+- `AnalyticsCategory` flags enum. `GameData.LevelData.MarkPassed(int)`.
+
+## [0.24.0] - 2026-09-29
+- Added `IRewardAds.IsCanShowFor(Placement)` (default interface method, default false). Lets rewarded ad readiness be checked per placement for consumers using ads routing.
+
+## [0.23.0] - 2026-09-27
+- `UICanvas.Open`/`Close` are now virtual. Added `Setup(param)` (pushes the back entry) and `CloseDirectly(param)` (no transition, no matching Open required, no `OnClose` hook, invalidates a pending outro).
+- Added `UIBackPushPolicy` and static `UICanvas.BackPushPolicy` (default `OnOpen`, unchanged behaviour). `ExplicitSetup` makes only `Setup` push.
+- Scope exit now runs through the virtual `Close`, so view overrides execute. It still bypasses `CanClose`.
+- `Open`, `Setup`, `CloseDirectly` and close completion tolerate a null `Locator.UI`.
+- `IUIService` adds `CloseUIDirectly`, `IsContain` and `IsInBackStack`; `UIBackStack.Contains`. Implementers must add the three members.
+- `UiScopeRegistry.Enter` reuses its snapshot list, falls back to a fresh list on nested re-entry, and skips canvases already closed by a nested transition.
+
+## [0.22.0] - 2026-09-26
+- Added `IUIAcquisitionService`, `UIAcquireResult<T>`, and typed failure categories for optional addressed UI loading without changing `IUIService`.
+- Added neutral `Quang.UI.Scoping` path, scope, registry, and canvas lifecycle hooks for hierarchy-based UI ownership. Existing canvases remain global by default. Reopen invalidates a pending close completion.
+
+## [0.21.1] - 2026-09-20
+- Added `MotionProbe` utility in `Quang.Base` for non-allocating kinematic diagnostics.
+
+## [0.20.1] - 2026-08-28
+- Fix: `LoadStart` loaded `GameScene` by hardcoded build index 2, which assumed CryptoLoader
+  always occupies index 0. Disabling CryptoLoader in Build Settings (release-style run with the
+  debug gate off) shifts every later scene's index down by one, so index 2 pointed past the end
+  of the list ("Scene with build index: 2 couldn't be loaded because it has not been added to
+  the build settings") followed by a `NullReferenceException` on the resulting async op. Now
+  loads `GameScene` by name via `SceneGameManager.LoadingSceneAsync(string)`, which is immune to
+  index shifts regardless of whether CryptoLoader is included in the build.
+
+## [0.20.0] - 2026-08-17
+- Persistence contracts (`IPersistenceService`, `ISaveStore`, `SaveDefinition<T>`, envelope/codec/protector interfaces) moved out to new `com.quang.persistence` package. `Quang.Base` now depends on it; namespaces unchanged (`Quang.Base.Persistence`).
+
+## [0.19.4] - 2026-08-15
+- `ItemId` now accepts an optional namespace segment and uppercase characters, so catalog ids authored from CSV display names (`Pump_Shotgun`) parse without a `namespace.` prefix. Equality remains Ordinal, so `Gold` and `gold` stay distinct ids.
+
+## [0.19.3] - 2026-08-15
+- Removed Custom ID button/text-entry from ItemId Odin drawer; dropdown-only selection now.
+
+## [0.19.2] - 2026-08-11
+- Added provider-neutral extensible ItemId editor registry, Base definitions, searchable Odin drawer, and unknown-ID validation UI.
+
+## [0.19.1] - 2026-08-09
+- Fix: Stat Reset invalidates its cached final value; add the generic modifier-filter API.
+- Dependency alignment: com.quang.designpattern 0.4.2 -> 0.4.3; com.quang.utilities 0.2.1 -> 0.2.2.
+
+## [0.19.0] - 2026-07-28
+### Added
+- Added vendor-neutral Ads request contracts: `AdsRequestId`, `AdsRequestKind`, `AdsRequestOutcome`, `AdsShowRequest`, `AdsShowResult`, and `IAdsRequestService`.
+- Added pause lease contracts and default `PauseService` with `Locator.Pause` compatibility slot.
+
+## [0.18.0] - 2026-07-27
+### Added
+- Added neutral UTC time contracts: `IClock`, `SystemClock`, `RewardDayKey`, and `RewardDayPolicy`.
+- Added vendor-neutral reward integrity contracts: deterministic `RewardClaimId`, reward grant items/results, `IRewardGrantService`, `RewardAuthorization`, `RewardClaimRequest`, `RewardClaimResult`, `RewardRecoveryReport`, and `IRewardClaimCoordinator`.
+
+### Notes
+- `SystemClock` is the only affected-domain production type that reads `DateTime.UtcNow` directly.
+- Reward claim coordination is a recoverable protocol boundary, not a physical cross-store transaction.
+
+## [0.17.0] - 2026-07-24
+### Added
+- Added vendor-neutral purchase integrity contracts: logical product IDs, availability/results, transaction snapshots, restore/reconcile aggregates, `IPurchaseIntegrityService`, and `IPurchaseGrantHandler`.
+- Added `UnsupportedPurchaseIntegrityService` for DesktopPremium/Base-only compositions that intentionally omit purchasing.
+
+### Changed
+- Existing `IIAPService` callback contract is now obsolete in favor of `IPurchaseIntegrityService`; source compatibility is preserved for legacy callers.
+
+## [0.16.0] - 2026-07-23
+### Added
+- Added DI-neutral persistence contracts, typed save definitions, structured results, migrations, codecs, protectors, diagnostics, and compatibility-definition composition.
+
+### Changed
+- `Database.Save<T>` and `Database.Load<T>` remain synchronous and source-compatible but now delegate to a configured `IPersistenceService` instead of writing raw PlayerPrefs JSON.
+- Projects without `com.quang.data` now receive an actionable configuration error instead of silently falling back to unsafe persistence.
+
+## [0.15.0] - 2026-07-21
+### Changed (BREAKING)
+- Removed the legacy numeric item enum and runtime migration adapters. Item service APIs, save data, and reward contracts now use `ItemId`.
+- Save data uses the versioned key `GameData.item-id-v1`.
+- Moved `SDKToolkitWindow` into the Editor-only `Quang.Base.Editor` assembly; runtime behavior is unchanged.
+
+## [0.14.0] - 2026-07-16
+### Added
+- **Canon input contract**: `partial interface IInputService` (`SetInput(bool active, params string[] maps)`, `DisableAllInput()`) and the `Locator.Input` slot, promoted from Horror1Game (B4 Wave 6).
+- **Why:** every game needs an input service; the framework had no contract for one, so Horror1Game defined `IInputService` + `Locator.Input` itself inside its `Quang.Base.asmref` folder. The generic surface is now canon; the game-specific surface (Horror's `GetInputActions()` returning its generated `PlayerInputActions` wrapper) stays a game-side partial part in the asmref folder. Same open-vs-closed split as `Locator.Data`.
+
+## [0.13.0] - 2026-07-15
+- **BREAKING: `IUIService` gains `GetUIAsync<T>(Action<T> onComplete)`.** Any implementer must add it (in practice there is exactly one: `com.quang.ui`'s `UIManager`).
+- **Why:** surfaced by Horror1Game's tutorial adoption (B4 Wave 3). A game may load its canvases asynchronously — Horror's tutorial canvases are Addressables, not registry-resolvable — but the framework's `TutorialUIController` could only call the synchronous `GetUI<T>()`. Canvas *loading strategy* is a per-game concern the framework had closed off, the same open-vs-closed mistake as `EVENTS.cs` (ADR-0002) and `GameData`/`CONSTANTS` (ADR-0003).
+- The default implementation resolves synchronously and invokes the callback immediately, so games whose canvases are registry-resolvable (TemplateGame) are unaffected. Callers must not assume the callback has run when the call returns.
+
+## [0.12.0] - 2026-07-14
+### Changed (BREAKING)
+- `Trigger` adopted Horror1Game's superset: a `Trigger(int frameReset = 1)` constructor (the reset delay was hardcoded to 1 frame), a `GetValue()` accessor, and the reset is now only scheduled when the value is set to `true` - setting it `false` no longer queues a redundant timer callback. Existing `new Trigger()` call sites keep the old 1-frame behaviour.
+### Added
+- `Quang.Base` asmdef now references `Unity.InputSystem` (already a declared package dependency). A game whose `Quang.Base.asmref` folder injects InputSystem-typed contracts - Horror1Game's `IInputService`/`PlayerInputActions` - could not compile without it.
+### Why
+Wave 2 of the Horror1Game adoption (B4). See `Docs/adr/adr-0003-horror-base-data-ui-adoption.md`.
+
+## [0.11.0] - 2026-07-14
+### Removed (BREAKING)
+- **Game content moved out of the framework.** `ENUM.GAMEPLAY.cs` (`PLACE_TYPE`, `SURFACE_STATE`, `SURFACE_TYPE`, `LEVEL_DIFFICULTY`, `LEVEL_PERFORMANCE_TYPE`), `ENUM.BASE.cs` (`DIRECTION`) and `CONSTANTS.cs` (`VEHICLE_TAG`, `HOLDER_TAG`, `CUT_SCALE_VALUE`, `MAX_LEVEL`, ...) were TemplateGame's content, not the framework's. All three files are **deleted from this package**; each game now declares them in `namespace Quang.Base` from its own `Quang.Base.asmref` folder.
+- `GameData.cs` lost the rice-game level-editor model: `LevelData` (outer), `UnitData`, `RiceUnitData`, `KnifeUnitData`, `StaticRiceUnitData`, `HolderSlotData`, `PlaceTypeData`. Same treatment - game-owned, moved to the consuming game.
+### Changed (BREAKING)
+- `GameData` is now `public partial class`. A game adds its own serialized members from its `Quang.Base.asmref` folder. `Database`, `ItemData` and the save model itself are unchanged and stay here.
+### Why
+Second instance of the finding that retired `EVENTS.cs` from `com.quang.designpattern` in 0.4.0: a closed framework file that is really an open, per-game extension surface. Horror1Game could not adopt this package because its `GameData`/`CONSTANTS`/`ENUM.GAMEPLAY` carry horror content (`MovingBeltSlotData`, `InventoryItemType`, `INPUT_*_MAP`) and TemplateGame's carry rice-game content - neither can surrender to the other. Asmref-into-the-package-assembly is the seam already used by `com.quang.data` (`Locator.Data`) and `com.quang.services.iap` (`IAPData`); type names, namespaces and assemblies are unchanged, so **no consumer edits were needed**.
+
+
+## [0.10.0] - 2026-07-11
+### Changed
+- Namespace pass (B1 Pass 3 - base): `Base`->`Quang.Base` (67 files), `Base.Init`->`Quang.Base.Init` (4 files). rootNamespace updated on `Quang.Base.asmdef`. **Explicitly excluded** (squats owned by other families, per Pass 1/2 precedent): `Base.UI` (ui package, Pass 6), `Base.Combat`/`Base.StatusEffects` (combat package, already Pass 4's territory).
+- Folded in 3 bare-`Base` files physically living outside this package that squatted this namespace: `com.quang.data`'s `IDataService.cs`/`Locator.Data.cs` (Pass 2 deferred these here), `com.quang.combat`'s `IDamageable.cs`/`SkillExecutionContext.cs`/`ISingleInstanceStackable.cs`, `com.quang.tools`'s `MetaGuidUnifierWindow.cs`, `com.quang.ui`'s `UISButton.cs`/`MaskRaycastImage.cs` - all renamed `Base`->`Quang.Base` alongside this package's own files, consistent with the squat-follows-namespace convention.
+### Fixed
+- **New shadow-bug shape found this pass** (same family as Pass 1's `Quang.Utilities.Input` shadow, worse): any file with `namespace Quang.Base { using Base.UI; }` (indented) now self-shadows - "Base" resolves to the enclosing `Quang.Base` namespace itself (nested-dot-namespace member lookup) instead of the intended global `Base` root, since `Quang.Base` textually contains a reachable member literally named "Base" (itself). Fixed via `using global::Base.UI;` in `IUIService.cs`, `DebugManager.cs`, `InitCanvas.cs` (that last one via bare `using UI;`, which shadowed to `Base.UI` under the OLD nesting and had to become `using global::Base.UI;` too).
+- **Flip side found in the deferred `Base.UI`/`Base.Combat` families:** files there that relied on implicit enclosing-namespace access to bare-`Base` members (e.g. `UICanvas.cs` calling `Locator` unqualified) broke once `Base` became `Quang.Base` and `Base.UI`/`Base.Combat` didn't move with it - fixed by adding explicit `using Quang.Base;` (`UICanvas.cs`, `UIButton.cs`, `UIManager.cs` in com.quang.ui; `DamageDealtContext.cs` in com.quang.combat). **Any future pass touching `Base.UI`/`Base.Combat`/`Base.StatusEffects` should grep for unqualified base-family symbol usage first** - this class of break will recur.
+
+## [0.9.0] - 2026-07-11
+- **Migration (B1 Pass 1 - foundations):** the embedded `Quang.Utilities.Input` assembly (`Runtime/Utilities/Input/`, physically inside this package's folder despite the name) namespace `Utilities.Input` -> `Quang.Utilities.Input` (LineDrawInput.cs, PlayerInput.cs). asmdef `rootNamespace` updated to match.
+- Consumer fix for the designpattern/utilities Pass 1 rename: this package's `using DesignPattern;`/`using Utilities;`/`using Utilities.Timer;` occurrences updated to `Quang.*` wherever they referenced real package types (`GameData.cs`, `DebugManager.cs`, `InitManager.cs`, `SceneGameManager.cs`, `AOEDetection.cs`, and the two Utilities.Input files above); left unchanged wherever they referenced this package's own base-owned squatter types (`DevLog`/`UTILITIES`/`ObjectContainer`, still bare `Utilities`/`DesignPattern` — those three files stay in-package, in scope for Pass 3 instead).
+
+## [0.8.0] - 2026-07-11
+- Added `IRevenueEventSink` contract + `Locator.RevenueSink` slot (Ph6, `Runtime/Services/Contracts/Ads`) - ads report mediation revenue through this instead of a direct AppsFlyer/analytics reference.
+
+## [0.7.0] - 2026-07-10
+- BREAKING: `Base.IDamageable` moved to com.quang.combat (Quang.Combat.Core) and recomposed as `IDamageTarget + ICombatDamageable + ILogicEffectReceiver` (typed DamageHit damage; old float/ELEMENTAL overloads removed).
+- Added `IDamageTarget`, `ILogicEffectReceiver` contracts (from PetVsMonster).
+- `AOEDamage` moved to com.quang.combat (calls TakeDamage(DamageHit); illegal at L1). AOEDetection/TargetDetection infra unchanged.
+
+## [0.6.0] - 2026-07-07
+- Items contracts (`IItemService`, `Locator.Items`, `ItemId`, and `ITEM_RARITY`) moved in from `_Items/Base/` to `Runtime/Services/Contracts/Items/`. Their `Quang.Base.asmref` injection site deleted. `Quang.Items` (the concrete manager, `Items.json`) stays game-side — only the contracts are shared.
+
+## [0.5.0] - 2026-07-07
+- Stats trio union-merge with Horror1Game canon: `Stat` gains `StatModifiers` (readonly view over the modifier list) and ctor chaining (`Stat(float) : this()`) from H1; PR-side members kept as-is (`Copy()`, `RemoveAllModifiersExceptSource`, null-guards, `CompareModifierOrder`).
+- Added `TrackingStat.cs` (H1-only, verbatim) — bounded-value tracker over a max/min `Stat` pair with boundary-cross events.
+- `DevId` enum gained `Gameplay` member (+ matching DevColors entry) — H1 character core logs with `DevId.Gameplay`.
+- `Quang.Base.asmdef` gained a direct `Quang.Utilities` reference (needed by `TrackingStat`'s `Utilities` namespace usage; previously only reachable via `Quang.Utilities.STimer`, which does not re-export it).
+
+## [0.1.0] - 2026-07-07
+- Extracted from Assets/_Game (mechanical move, no code changes).
+
+## [0.2.0] - 2026-07-07
+- Service contracts moved in from module Base/ folders: Ads, IAP, Analytics, Audio (interfaces, Locator slots, enums). Their Quang.Base.asmref injection sites deleted.
+
+## [0.3.0] - 2026-07-07
+- IGameplayService merged with FistInTheMist superset (additive): AddMoney, ChangeScene, UsingSkill/IsCanUseSkill, IsActiveScene/SetActiveScene, OnEndGame, ShakeCamera, GameplayCamera, PlayerTransform. Left out: DecreaseSleepHp (FitM-game-specific, user decision).
+- Reconciliation verdicts: FitM IDataService identical to com.quang.data (no-op); FitM IAds family + IAnalytic REJECTED (older shapes, zero implementations in FitM — Contracts/ versions are canon); IRewardItemService left out (depends on FitM GameData.ItemData).
+
+## [0.4.0] - 2026-07-07
+- UI contracts (IUIService, Locator.UI) moved in from _UI/Base to Runtime/Services/Contracts/UI/. UICanvas, UITransition, UIBackStack follow in wave 2b (IUIService generic constraints require UICanvas in this assembly). Surface redesigned same wave — see Docs/2026-07-07-ui-framework-design.md.

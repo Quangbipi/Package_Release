@@ -1,0 +1,20 @@
+{
+    "name": "Quang.Ads.Integration.Max",
+    "rootNamespace": "Quang.Ads.Integration.Max",
+    "references": [
+        "Quang.Ads",
+        "Quang.Base",
+        "MaxSdk.Scripts"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "QUANG_ADS_MAX"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

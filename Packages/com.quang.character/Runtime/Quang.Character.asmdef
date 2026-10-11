@@ -1,0 +1,22 @@
+{
+    "name": "Quang.Character",
+    "rootNamespace": "",
+    "references": [
+        "DOTween.Modules",
+        "Unity.InputSystem",
+        "Quang.Utilities.STimer",
+        "Quang.DesignPattern",
+        "Quang.Utilities",
+        "Quang.Base",
+        "Quang.Data"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

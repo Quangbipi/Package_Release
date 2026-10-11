@@ -1,0 +1,21 @@
+{
+    "name": "Quang.Ads",
+    "rootNamespace": "Quang.Ads",
+    "references": [
+        "Quang.DesignPattern",
+        "Quang.Utilities.STimer",
+        "Quang.Utilities",
+        "Quang.Common",
+        "Quang.Base",
+        "Quang.Data"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

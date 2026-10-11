@@ -1,0 +1,7 @@
+namespace Quang.UI
+{
+    public interface IUIPrefabProvider
+    {
+        T GetPrefab<T>() where T : UICanvas;
+    }
+}

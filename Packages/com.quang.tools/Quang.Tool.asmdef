@@ -1,0 +1,17 @@
+{
+    "name": "Quang.Tool",
+    "rootNamespace": "Quang.Tool",
+    "references": [
+        "DOTween.Modules",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

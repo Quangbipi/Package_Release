@@ -1,0 +1,16 @@
+{
+    "name": "Quang.Sync.Simulator",
+    "rootNamespace": "",
+    "references": [
+        "Quang.Sync"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

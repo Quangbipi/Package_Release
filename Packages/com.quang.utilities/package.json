@@ -1,0 +1,13 @@
+{
+  "name": "com.quang.utilities",
+  "version": "0.2.2",
+  "displayName": "Quang Utilities",
+  "description": "Low-level helpers: general utilities, LitJson wrapper (Quang.Utilities.Json), timers (Quang.Utilities.STimer).",
+  "unity": "2022.3",
+  "keywords": [
+    "layer:0"
+  ],
+  "dependencies": {
+    "com.quang.designpattern": "0.4.5"
+  }
+}

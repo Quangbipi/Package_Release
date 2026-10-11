@@ -1,0 +1,22 @@
+{
+    "name": "Quang.Ads.Integration.IronSource",
+    "rootNamespace": "Quang.Ads.Integration.IronSource",
+    "references": [
+        "Quang.Ads",
+        "Quang.Base",
+        "Quang.DesignPattern",
+        "Quang.Utilities.STimer",
+        "Unity.LevelPlay"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "QUANG_ADS_IRONSOURCE"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,16 @@
+{
+  "name": "com.quang.ui",
+  "version": "0.8.0",
+  "displayName": "Quang UI",
+  "description": "UI framework: UIManager facade, UICanvas lifecycle, transitions, widgets.",
+  "unity": "2022.3",
+  "keywords": [
+    "layer:4"
+  ],
+  "dependencies": {
+    "com.quang.designpattern": "0.4.5",
+    "com.quang.utilities": "0.2.2",
+    "com.quang.base": "0.26.0",
+    "com.unity.addressables": "1.22.3"
+  }
+}

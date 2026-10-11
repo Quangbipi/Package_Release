@@ -1,0 +1,20 @@
+{
+    "name": "Quang.Utilities.Input",
+    "rootNamespace": "Quang.Utilities.Input",
+    "references": [
+        "Quang.Base",
+        "Quang.Utilities.STimer",
+        "Quang.Utilities",
+        "Quang.DesignPattern",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

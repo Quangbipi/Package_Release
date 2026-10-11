@@ -1,0 +1,139 @@
+# Quang Services Analytics
+
+One analytics proxy (`Locator.Analytics`) that fans every tracked event out to any combination of Firebase, AppsFlyer, AppMetrica and GameAnalytics. Each backend is switchable at build time by a scripting define and at edit time by `Quang/Analytics/Settings`.
+
+Contracts (`IAnalyticsService`, `IRevenueEventSink`, `AnalyticsCategory`, Locator slots) live in `com.quang.base` `Runtime/Services/Contracts`. Game code only ever calls `Locator.Analytics`.
+
+## Install
+
+1. Import the SDKs you want (Firebase, AppsFlyer, AppMetrica, GameAnalytics). The GameAnalytics SDK ships as plain source with no asmdef, so the project adds `Assets/GameAnalytics/Plugins/Scripts/GameAnalyticsSDK.asmdef`; re-add it after re-importing the SDK. Enter GameAnalytics game/secret keys in `Window/GameAnalytics/Select Settings`.
+2. Open `Quang/Analytics/Settings`. It creates `Assets/Resources/QuangAnalyticsSettings.asset` with one row per backend.
+3. Per row: tick **enabled**, choose the **categories** it receives, enter keys (AppsFlyer: dev key + iOS app id; AppMetrica: API key; Firebase and GameAnalytics need no key here).
+4. Press **Apply scripting defines**. It writes one `QUANG_ANALYTICS_<ID>` define per enabled row for Android, iOS and Standalone, and Unity recompiles.
+5. To truly strip a backend from a build, delete its SDK folder from `Assets/`. A define off only removes our adapter code; the SDK's native libraries still ship while its folder exists. The window warns about this.
+
+A backend whose SDK is missing cannot be enabled (red box, Apply blocked). A backend whose key is empty is dropped at startup with one error log; the game and the other backends keep working.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    Caller[Game code] --> Loc[Locator.Analytics]
+    Ads[Ads revenue] --> Rev[Locator.RevenueSink]
+    Loc --> Svc[AnalyticsService proxy]
+    Rev --> Svc
+    Svc --> Route{category match}
+    Route --> FBB[FirebaseBackend]
+    Route --> AFB[AppsFlyerBackend]
+    Route --> AMB[AppMetricaBackend]
+    Route --> GAB[GameAnalyticsBackend]
+    FBB --> FB[Firebase SDK]
+    AFB --> AF[AppsFlyer SDK]
+    AMB --> AMS[AppMetrica SDK]
+    GAB --> GA[GameAnalytics SDK]
+```
+
+```mermaid
+flowchart TD
+    subgraph Base[com.quang.base]
+        HB[Quang.Base contracts and AnalyticsCategory]
+    end
+    subgraph Pkg[com.quang.services.analytics]
+        Core[Quang.Analytics core no SDK refs]
+        IFB[Integration.Firebase]
+        IAF[Integration.AppsFlyer]
+        IAM[Integration.AppMetrica]
+        IGA[Integration.GameAnalytics]
+        Ed[Quang.Analytics.Editor]
+    end
+    Core --> HB
+    IFB --> Core
+    IAF --> Core
+    IAM --> Core
+    IGA --> Core
+    Ed --> Core
+```
+
+Startup: each integration assembly registers its backend with `AnalyticsBackends` at `AfterAssembliesLoaded`; `AnalyticsBootstrap` (`BeforeSceneLoad`) reads the settings asset, initializes every registered backend, keeps the ones that initialize, builds one `AnalyticsService` and assigns `Locator.Analytics` and `Locator.RevenueSink`. No prefab is needed. With zero backends the locator still holds a no-op proxy.
+
+## Categories
+
+| Category | Proxy methods | Default subscribers |
+|---|---|---|
+| `Ads` | ad funnel, first ads session | Firebase, GameAnalytics |
+| `Product` | IAP, level pass | Firebase, AppsFlyer, AppMetrica, GameAnalytics |
+| `Design` | tutorial, currency, level start/fail/stars, custom GD events | Firebase, GameAnalytics |
+| `Revenue` | ad impression revenue | Firebase, AppsFlyer |
+
+AppMetrica defaults to `Product` only: its plugin already auto-tracks MAX and IronSource ad revenue (`APPMETRICA_FEATURES_ADREVENUE_*` defines), so routing `Revenue` too would double-count. The settings window warns if you turn it on while those defines exist. `AnalyticsCategory` numeric values are serialized in the settings asset: never renumber.
+
+## Public API index
+
+| Type | Assembly | One line |
+|---|---|---|
+| `AnalyticsCategory` (com.quang.base) | `Quang.Base` | `[Flags]` routing tag: None, Ads, Product, Design, Revenue, All |
+| `IAnalyticsService` (com.quang.base) | `Quang.Base` | Game-facing contract behind `Locator.Analytics` |
+| `IAnalyticsBackend` | `Quang.Analytics` | What an SDK adapter implements: Initialize, LogEvent, SetUserProperty, LogAdRevenue |
+| `AnalyticsService` | `Quang.Analytics` | The proxy; implements `IAnalyticsService` and `IRevenueEventSink`, isolates backend exceptions |
+| `AnalyticsBackends` | `Quang.Analytics` | Static registry integration assemblies add themselves to |
+| `AnalyticsSettings` | `Quang.Analytics` | ScriptableObject at `Resources/QuangAnalyticsSettings`: debugLog + one entry per backend |
+| `AnalyticsBackendEntry` | `Quang.Analytics` | Per-backend row: id, enabled, categories, apiKey, appId; default routing |
+| `AnalyticsBackendIds` | `Quang.Analytics` | Backend id constants, define names, define rewrite |
+| `AnalyticsBootstrap` | `Quang.Analytics` | Composition root; `Install(settings, backends)` is the testable seam |
+| `AnalyticsText` | `Quang.Analytics` | Culture-invariant helpers: name sanitizing, value strings, flat JSON |
+| `RecordingAnalyticsBackend` | `Quang.Analytics` | Test double backend; records events, can be told to throw |
+| `RecordedEvent`, `RecordedRevenue` | `Quang.Analytics` | Records captured by the test double |
+| `AnalyticsSettingsWindow` | `Quang.Analytics.Editor` | `Quang/Analytics/Settings`: switches, keys, Apply defines |
+| `FirebaseBackend` | `Quang.Analytics.Integration.Firebase` | Firebase Analytics + Messaging, queues events until Firebase is ready (cap 100) |
+| `FirebaseRemoteConfigCache` | `Quang.Analytics.Integration.Firebase` | Non-blocking Remote Config: `IsReady`, `Fetched`, `TryGetString/Long/Double/Bool` |
+| `AppsFlyerBackend` | `Quang.Analytics.Integration.AppsFlyer` | Inits AppsFlyer from settings, mediation-aware ad revenue |
+| `AppMetricaBackend` | `Quang.Analytics.Integration.AppMetrica` | Activates AppMetrica from settings, JSON event params |
+| `GameAnalyticsBackend` | `Quang.Analytics.Integration.GameAnalytics` | Every event becomes a design event; keys live in GA's own settings; user properties and revenue are no-ops |
+
+Backend C# namespace is `Quang.Analytics.Backends`. Never name a namespace segment `Firebase`: it shadows the SDK's root `Firebase` namespace.
+
+## Adding a GD event
+
+- One-off: `Locator.Analytics.LogEvent("event_name", AnalyticsCategory.Design, parameters)`. No backend changes.
+- Worth a name: add a method to `IAnalyticsService` (base), implement it in `AnalyticsService` with its category, and add a name test to `AnalyticsServiceTests`.
+
+Event names of existing methods are byte-identical to the 0.3.x Firebase names so dashboards keep working, except FAIL (now `level_{n}_fail` / `ftu_level_{n}_fail`). Firebase sanitizes names to `[A-Za-z0-9_]`, letter start, 40 chars, so a GD name with spaces or a leading digit is still delivered.
+
+Level pass state belongs to save data: on COMPLETE call `GameData.level.MarkPassed(level)` and pass its result as `firstPass` to `LevelTrackEvent`.
+
+## Tracking (message space)
+
+Game code sends facts; rules turn them into events. Design: `.cursor/plans/analytics-message-space-design.md`, map of every message: `.cursor/plans/analytics-message-space-atlas.md`.
+
+    AnalyticsTracking.Facts.StageStart(12, replay: false);
+    AnalyticsTracking.Facts.WaveReached(5);
+    AnalyticsTracking.Facts.StageEnd(StageResult.Fail);
+    AnalyticsTracking.Facts.Feature("skill_pick", ("skill_id", "fire_ring")); // id must be in TrackingSettings.featureEvents
+    AnalyticsTracking.Register(new MyGameRule());                           // before the first frame
+
+| Type | Assembly | One line |
+|---|---|---|
+| `ITrackingNamingProfile` | `Quang.Analytics` | Optional wire event/template/key mapping; canonical facts and state stay unchanged |
+| `AnalyticsTracking` | `Quang.Analytics` | Static entry: `Facts` (never null) and `Register(IRule)` |
+| `TrackingFacts` | `Quang.Analytics` | Fact API: StageStart, WaveReached, StageEnd, Progress, Gacha, Feature, Tutorial |
+| `Fact`, `FactKind`, `StageResult`, `MonetizeKind`, `TutorialPhase` | `Quang.Analytics` | Immutable fact and its enums |
+| `IRule` | `Quang.Analytics` | Rule contract: `Declare` events, handle `OnFact` |
+| `TrackingContext` | `Quang.Analytics` | FTU, stage, wave, replay, attempt, focus, away time, install day, state |
+| `TrackingPipeline` | `Quang.Analytics` | Queues facts until Start, runs context and rules, isolates failures, saves at ColdStart/Blur/StageEnd |
+| `EventEmitter` | `Quang.Analytics` | ftu_ prefix, A/B mode, 40-char fallback, B-name budget; all events Design |
+| `TrackingSettings`, `OutputMode`, `ModeOverride` | `Quang.Analytics` | Optional asset `Resources/QuangTrackingSettings`: thresholds, modes, feature list |
+| `Counter`, `Since`, `Accum`, `Pending`, `PendingRecord`, `OncePer` | `Quang.Analytics` | Persisted operators over one state key |
+| `Bucket`, `BucketSet` | `Quang.Analytics` | Inclusive upper-bound labels; last bucket catches the rest |
+| `TrackingState`, `TrackingStateModel` | `Quang.Analytics` | Keyed persisted values; save model v1 (ADR-E5-0007) |
+| `ITrackingStateStore`, `DatabaseTrackingStateStore`, `InMemoryTrackingStateStore` | `Quang.Analytics` | State persistence: Database facade, or memory fallback and tests |
+| `ITrackingClock`, `SystemTrackingClock` | `Quang.Analytics` | Wall clock seam |
+| `TrackingBootstrap` | `Quang.Analytics` | Builds and installs the pipeline; called by `AnalyticsBootstrap` |
+| `StandardRules` | `Quang.Analytics` | The opt-in standard rule pack |
+
+## Tests
+
+EditMode `Quang.Analytics.Tests`: `CoreHelpersTests`, `AnalyticsServiceTests`, `AnalyticsBootstrapTests`, `TrackingStateTests`, `OperatorTests`, `EventEmitterTests`, `TrackingPipelineTests`, `SessionRulesTests`, `StageRulesTests`, `StreakRulesTests`, `GachaRulesTests`, `FeatureRulesTests`, `TrackingFacadeTests`. They exercise the real proxy against `RecordingAnalyticsBackend`. SDK-bound backends have no EditMode test; they are verified by compile with the define on plus Play Mode, device and dashboard DebugView unverified.
+
+### Optional wire naming profile
+
+Call `AnalyticsTracking.SetNamingProfile(profile)` before the first frame; installation applies it before queued facts replay. Pass null to restore canonical output. `TrackingPipeline.SetNamingProfile` and `EventEmitter.SetNamingProfile` provide the same seam for direct construction. Fixed names are mapped before the FTU prefix; B templates are mapped before rendering and length checks. Successfully rendered B holes are consumed before remaining parameter keys are mapped. Parameter values retain their types. Invalid names or key collisions fall back to canonical output with a warning. User properties and canonical facts/state are unaffected. Games own their maps and validation; the package has no PVM dependency.

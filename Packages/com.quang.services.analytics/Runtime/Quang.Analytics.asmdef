@@ -1,0 +1,16 @@
+{
+    "name": "Quang.Analytics",
+    "rootNamespace": "Quang.Analytics",
+    "references": [
+        "Quang.Base"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,29 @@
+{
+  "name": "Quang.Data.Editor.Tests",
+  "references": [
+    "Quang.Data",
+    "Quang.Data.Editor",
+    "Quang.Base",
+    "Quang.Persistence",
+    "Quang.Base.Editor",
+    "Sirenix.OdinInspector.Editor",
+    "Sirenix.Serialization",
+    "Sirenix.OdinInspector.Attributes",
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner"
+  ],
+  "includePlatforms": ["Editor"],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "nunit.framework.dll",
+    "Sirenix.OdinInspector.Editor.dll",
+    "Sirenix.Serialization.dll",
+    "Sirenix.OdinInspector.Attributes.dll"
+  ],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

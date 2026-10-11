@@ -1,0 +1,18 @@
+{
+  "name": "com.quang.services.iap",
+  "version": "0.7.5",
+  "displayName": "Quang Services IAP",
+  "description": "Purchase integrity pipeline with catalog, ledger, validator, and Unity Purchasing adapter.",
+  "unity": "2022.3",
+  "keywords": [
+    "layer:4"
+  ],
+  "dependencies": {
+    "com.quang.designpattern": "0.4.5",
+    "com.quang.utilities": "0.2.2",
+    "com.quang.base": "0.26.0",
+    "com.quang.data": "0.12.6",
+    "com.quang.persistence": "0.1.0",
+    "com.unity.purchasing": "5.1.1"
+  }
+}

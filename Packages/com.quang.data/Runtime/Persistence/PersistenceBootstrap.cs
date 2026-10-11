@@ -1,0 +1,85 @@
+using System;
+using System.IO;
+using Quang.Base.Persistence;
+using UnityEngine;
+
+namespace Quang.Data.Persistence
+{
+    public sealed class CompatibilitySaveDefinitionFactory : ICompatibilitySaveDefinitionFactory
+    {
+        private readonly ISaveCodec codec;
+        private readonly ISaveProtector protector;
+        private readonly ISaveDiagnostics diagnostics;
+
+        public CompatibilitySaveDefinitionFactory(
+            ISaveCodec codec,
+            ISaveProtector protector,
+            ISaveDiagnostics diagnostics = null)
+        {
+            this.codec = codec ?? throw new ArgumentNullException(nameof(codec));
+            this.protector = protector ?? throw new ArgumentNullException(nameof(protector));
+            this.diagnostics = diagnostics ?? NullSaveDiagnostics.Instance;
+        }
+
+        public SaveDefinition<T> Create<T>(string key) where T : new()
+        {
+            diagnostics.Report(new SaveDiagnostic(
+                "SAVE_UNREGISTERED_COMPATIBILITY_DEFINITION",
+                key,
+                SaveDataSource.None,
+                SaveRecoveryState.None));
+
+            return new SaveDefinition<T>(
+                key,
+                1,
+                () => new T(),
+                value => value == null
+                    ? SaveValidationResult.Invalid("SAVE_VALIDATION_FAILED")
+                    : SaveValidationResult.Valid(),
+                Array.Empty<ISaveMigration>(),
+                new[] { key },
+                codec,
+                protector,
+                SaveFailurePolicy.CreateDefaultAfterEvidencePreserved);
+        }
+    }
+
+    public sealed class UnityDebugSaveDiagnostics : ISaveDiagnostics
+    {
+        public void Report(SaveDiagnostic diagnostic)
+        {
+            Debug.LogWarning($"[{diagnostic.Code}] save={diagnostic.SaveKey} source={diagnostic.Source} recovery={diagnostic.Recovery} evidence={diagnostic.EvidencePath}");
+        }
+    }
+
+    public static class PersistenceBootstrap
+    {
+        private const string KeyPurpose = "persistence-hmac-v1";
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        public static void InstallDefault()
+        {
+            if (Database.ServiceFactory == null)
+                Database.ServiceFactory = CreateDefault;
+        }
+
+        public static IPersistenceService CreateDefault()
+        {
+            string comQuangRoot = Path.Combine(Application.persistentDataPath, "ComQuang");
+            var codec = new BeneficialCompressionCodec(16 * 1024);
+            var diagnostics = new UnityDebugSaveDiagnostics();
+
+            var builder = new PersistenceBuilder()
+                .WithRoot(Path.Combine(comQuangRoot, "Saves"))
+                .WithCodec(codec)
+                .WithHmacProtection(new LocalSecretKeyProvider(Path.Combine(comQuangRoot, "Keys")), KeyPurpose)
+                .WithDiagnostics(diagnostics)
+                .WithLegacySource(new PlayerPrefsLegacySaveSource());
+
+            PersistenceService service = builder.Build();
+            PackageSaveDefinitions.RegisterAll(service, codec, builder.Protector);
+            Database.CompatibilityDefinitionFactory = new CompatibilitySaveDefinitionFactory(codec, builder.Protector, diagnostics);
+            return service;
+        }
+    }
+}

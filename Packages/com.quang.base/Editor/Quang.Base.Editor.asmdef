@@ -1,0 +1,22 @@
+{
+  "name": "Quang.Base.Editor",
+  "rootNamespace": "Quang.Base.Editor",
+  "references": [
+    "Quang.Base",
+    "Sirenix.OdinInspector.Editor",
+    "Sirenix.OdinInspector.Attributes",
+    "Sirenix.Utilities.Editor",
+    "Sirenix.Utilities"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

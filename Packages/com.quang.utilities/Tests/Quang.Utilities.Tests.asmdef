@@ -1,0 +1,20 @@
+{
+  "name": "Quang.Utilities.Tests",
+  "references": [
+    "Quang.Utilities",
+    "Quang.Utilities.STimer",
+    "Quang.Utilities.Json",
+    "Quang.DesignPattern",
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner"
+  ],
+  "includePlatforms": ["Editor"],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": ["nunit.framework.dll"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

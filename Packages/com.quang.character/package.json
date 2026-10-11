@@ -1,0 +1,17 @@
+{
+  "name": "com.quang.character",
+  "version": "0.2.8",
+  "displayName": "Quang Character",
+  "description": "Character core: modular Character<TDef,TStats> with Logic/Physic/WorldInterface/Brain systems, asset-driven PlayerInput, and BrainGraph \u2014 a self-contained node-graph AI with its own editor, requiring no external graph package. Canon source: Horror1Game.",
+  "unity": "2022.3",
+  "dependencies": {
+    "com.quang.designpattern": "0.4.5",
+    "com.quang.utilities": "0.2.2",
+    "com.quang.base": "0.26.0",
+    "com.quang.data": "0.12.6",
+    "com.unity.inputsystem": "1.18.0"
+  },
+  "keywords": [
+    "layer:3"
+  ]
+}

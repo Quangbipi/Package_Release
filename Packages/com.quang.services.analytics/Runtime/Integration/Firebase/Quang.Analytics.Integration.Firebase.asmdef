@@ -1,0 +1,19 @@
+{
+    "name": "Quang.Analytics.Integration.Firebase",
+    "rootNamespace": "Quang.Analytics.Backends",
+    "references": [
+        "Quang.Analytics",
+        "Quang.Base"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "QUANG_ANALYTICS_FIREBASE"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

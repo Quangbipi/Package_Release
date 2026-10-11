@@ -1,0 +1,19 @@
+{
+    "name": "Quang.Data",
+    "rootNamespace": "Quang.Data",
+    "references": [
+        "Quang.Base",
+        "Quang.Persistence",
+        "Quang.DesignPattern",
+        "Quang.Utilities.Json"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

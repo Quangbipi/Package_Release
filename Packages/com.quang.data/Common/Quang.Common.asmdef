@@ -1,0 +1,20 @@
+{
+    "name": "Quang.Common",
+    "rootNamespace": "Quang.Common",
+    "references": [
+        "Quang.Base",
+        "Quang.DesignPattern",
+        "Unity.TextMeshPro",
+        "Quang.Data",
+        "Quang.Utilities.STimer"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,13 @@
+{
+  "name": "com.quang.services.analytics",
+  "version": "0.5.1",
+  "displayName": "Quang Services Analytics",
+  "description": "One analytics proxy fanning out to Firebase, AppsFlyer, AppMetrica and GameAnalytics backends, each switchable by scripting define.",
+  "unity": "2022.3",
+  "keywords": [
+    "layer:4"
+  ],
+  "dependencies": {
+    "com.quang.base": "0.26.0"
+  }
+}

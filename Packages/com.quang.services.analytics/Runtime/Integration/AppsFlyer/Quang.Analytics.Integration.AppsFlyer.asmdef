@@ -1,0 +1,20 @@
+{
+    "name": "Quang.Analytics.Integration.AppsFlyer",
+    "rootNamespace": "Quang.Analytics.Backends",
+    "references": [
+        "Quang.Analytics",
+        "Quang.Base",
+        "AppsFlyer"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "QUANG_ANALYTICS_APPSFLYER"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

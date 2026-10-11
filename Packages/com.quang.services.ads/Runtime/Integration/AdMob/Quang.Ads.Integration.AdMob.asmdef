@@ -1,0 +1,28 @@
+{
+    "name": "Quang.Ads.Integration.AdMob",
+    "rootNamespace": "Quang.Ads.Integration.AdMob",
+    "references": [
+        "Quang.Ads",
+        "Quang.Base"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "GoogleMobileAds.dll",
+        "GoogleMobileAds.Common.dll",
+        "GoogleMobileAds.Unity.dll",
+        "GoogleMobileAds.Ump.dll",
+        "GoogleMobileAds.Ump.Unity.dll",
+        "GoogleMobileAds.Core.dll",
+        "Google.VersionHandler.dll",
+        "Google.MiniJson.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "QUANG_ADS_ADMOB"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

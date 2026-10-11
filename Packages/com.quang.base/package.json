@@ -1,0 +1,17 @@
+{
+  "name": "com.quang.base",
+  "version": "0.26.0",
+  "displayName": "Quang Base",
+  "description": "Core runtime: Locator, service contracts, persistence contracts, purchase contracts, init flow, stats, and base app glue. Includes Quang.Utilities.Input.",
+  "unity": "2022.3",
+  "keywords": [
+    "layer:1"
+  ],
+  "dependencies": {
+    "com.quang.designpattern": "0.4.5",
+    "com.quang.utilities": "0.2.2",
+    "com.quang.persistence": "0.1.0",
+    "com.unity.nuget.newtonsoft-json": "3.2.1",
+    "com.unity.inputsystem": "1.18.0"
+  }
+}
