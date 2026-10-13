@@ -1,6 +1,6 @@
 {
   "name": "com.quang.base",
-  "version": "0.26.0",
+  "version": "0.26.1",
   "displayName": "Quang Base",
   "description": "Core runtime: Locator, service contracts, persistence contracts, purchase contracts, init flow, stats, and base app glue. Includes Quang.Utilities.Input.",
   "unity": "2022.3",

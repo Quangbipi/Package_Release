@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.26.1] - 2026-10-14
+### Fixed
+- `InitCanvas`: `clearDataButton` is optional; listener wiring is skipped when it is unassigned instead of throwing `NullReferenceException`.
+
 ## [0.26.0] - 2026-09-30
 ### Added
 - `IAdsEntitlements` (`IsRemoveAds`, `IsPremiumRemoveAds`, `LevelIndex`), `NullAdsEntitlements`, and the `Locator.AdsEntitlements` slot: the host tells the ads module about remove-ads and progression without the ads module reading `GameData`.

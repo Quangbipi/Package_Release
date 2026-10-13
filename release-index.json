@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-10-11T15:04:12Z",
+  "generatedAt": "2026-10-13T17:10:36Z",
   "packages": {
     "com.quang.autotest": "0.4.4",
-    "com.quang.base": "0.26.0",
+    "com.quang.base": "0.26.1",
     "com.quang.character": "0.2.8",
     "com.quang.data": "0.12.6",
     "com.quang.designpattern": "0.4.5",
@@ -38,7 +38,7 @@
     "com.quang.ui",
     "com.quang.utilities"
   ],
-  "releaseTag": "release-2026.10.11.1",
+  "releaseTag": "release-2026.10.13.1",
   "schemaVersion": 1,
-  "sourceCommit": "3353de3b2cb5301c5cd67bbf6fc51d8d745f429b"
+  "sourceCommit": "d584472b14344341ea973bee84c2403223167d67"
 }

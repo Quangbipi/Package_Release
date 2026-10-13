@@ -45,7 +45,8 @@ namespace Quang.Base.Init
             iapToggle._OnValueChange += OnToggleValueChange;
 
             startButton.onClick.AddListener(OnStartButtonClick);
-            clearDataButton.onClick.AddListener(OnClearDataButtonClick);
+            if (clearDataButton != null)
+                clearDataButton.onClick.AddListener(OnClearDataButtonClick);
         }
 
         public void SetData(bool value1, bool value2, bool value3, bool value4, bool value5)
@@ -70,7 +71,8 @@ namespace Quang.Base.Init
         private void OnDestroy()
         {
             startButton.onClick.RemoveListener(OnStartButtonClick);
-            clearDataButton.onClick.RemoveListener(OnClearDataButtonClick);
+            if (clearDataButton != null)
+                clearDataButton.onClick.RemoveListener(OnClearDataButtonClick);
         }
         void OnClearDataButtonClick()
         {
