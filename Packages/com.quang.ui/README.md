@@ -38,6 +38,7 @@ Register canvases with `CanvasRegistry`, open/close them through `UIManager`, an
 - `IUIPrefabProvider` / `ResourcesPrefabProvider` — pluggable prefab resolution (swap for Addressables, etc.)
 - `UISButton` / `UIButtonComponent` — button widgets
 - `UIDropdown` — dropdown widget
+- `SafeAreaFitter` — fits a stretched `RectTransform` to `Screen.safeArea`; keep backgrounds outside it and interactive content inside
 - `UISCanvasTransition` — show/hide transition driver
 
 Public addressed acquisition types: `IUIAsyncPrefabProvider`, `IUIAddressResolver`, `UIPrefabLease`, `AddressablesUIPrefabProvider`, `AsyncCanvasRegistry`, `UIAcquireResult<T>`, and `UIAcquireFailure`. `UIManager.SetAsyncProvider` and `UIManager.AcquireAsync<T>` are the facade entry points.

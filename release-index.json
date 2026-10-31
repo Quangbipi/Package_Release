@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-13T17:10:36Z",
+  "generatedAt": "2026-10-31T18:25:08Z",
   "packages": {
     "com.quang.autotest": "0.4.4",
     "com.quang.base": "0.26.1",
@@ -16,7 +16,7 @@
     "com.quang.sync": "0.1.0",
     "com.quang.sync.simulator": "0.1.0",
     "com.quang.tools": "0.11.0",
-    "com.quang.ui": "0.8.0",
+    "com.quang.ui": "0.9.0",
     "com.quang.utilities": "0.2.2"
   },
   "publicRoots": [
@@ -38,7 +38,7 @@
     "com.quang.ui",
     "com.quang.utilities"
   ],
-  "releaseTag": "release-2026.10.13.1",
+  "releaseTag": "release-2026.10.31.1",
   "schemaVersion": 1,
-  "sourceCommit": "d584472b14344341ea973bee84c2403223167d67"
+  "sourceCommit": "12a2032412ad37f6168f090dd75fc25267f33c66"
 }

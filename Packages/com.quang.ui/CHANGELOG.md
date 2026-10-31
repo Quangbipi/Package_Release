@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.9.0] - 2026-11-01
+- Added `SafeAreaFitter`: fits a `RectTransform` to `Screen.safeArea` (notch, home indicator) by driving its anchors, and reapplies when the safe area or screen size changes. Static `ComputeAnchors` is covered by EditMode tests.
+
 ## [0.8.0] - 2026-10-07
 - **Behaviour change:** every `UIAnim` tween (`UIPositionAnim`, `UIAlphaAnim`, `UIScaleAnim`, `UIPunchAnim`) now runs with `SetUpdate(true)`: UI animation and `OnAnimExit` no longer depend on `Time.timeScale`, so a canvas can open and close while the world is paused or slowed.
 - `UISCanvas.AnyOpened` static event, raised once per open from `OnOpen` (before activation).
