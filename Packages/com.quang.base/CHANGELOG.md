@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.27.0] - 2026-11-03
+### Added
+- `SFX_TYPE.BLOCK_PLACE` (112) and `SFX_TYPE.LINE_CLEAR` (113) for block-puzzle games.
+
 ## [0.26.1] - 2026-10-14
 ### Fixed
 - `InitCanvas`: `clearDataButton` is optional; listener wiring is skipped when it is unassigned instead of throwing `NullReferenceException`.

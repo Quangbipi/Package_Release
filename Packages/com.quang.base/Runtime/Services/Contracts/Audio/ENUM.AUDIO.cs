@@ -37,6 +37,8 @@ namespace Quang.Base
         STAR_POP_1 = 109,
         STAR_POP_2 = 110,
         STAR_POP_3 = 111,
+        BLOCK_PLACE = 112,
+        LINE_CLEAR = 113,
     }
 
     public enum BGM_TYPE
