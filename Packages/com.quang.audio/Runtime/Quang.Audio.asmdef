@@ -2,7 +2,9 @@
     "name": "Quang.Audio",
     "rootNamespace": "Quang.Audio",
     "references": [
-        "Quang.Base"
+        "Quang.Base",
+        "Quang.Data",
+        "Quang.DesignPattern"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -7,27 +7,34 @@ Default implementation of the `IAudioService` contract from `com.quang.base`. Co
 ## Layer + dependencies
 
 - Layer: `4`
-- Dependencies: `com.quang.base` 0.27.0 (no DOTween / Odin)
+- Dependencies: `com.quang.base` 0.27.0, `com.quang.data` 0.12.6, `com.quang.designpattern` 0.4.5
+- Prerequisites: DOTween, Sirenix Odin Inspector (serialization)
 
 ## Quick start
 
-1. **Create > Quang > Audio > Audio Library** and map each `SFX_TYPE` / `BGM_TYPE` you use to clips.
-2. Add an `AudioManager` component to a root GameObject in the first scene and assign the library. It registers `Locator.Audio` in `Awake` and survives scene loads (`dontDestroyOnLoad`).
-3. Play: `Locator.Audio?.PlaySfx(SFX_TYPE.CLICK)`, `Locator.Audio?.PlayBgm(BGM_TYPE.HOME)`.
-4. Mute: call `ToggleSfxVolume` / `ToggleBgmVolume` at startup with the saved settings (e.g. `GameData.setting.isSfxMute`) and whenever the player changes them.
+1. **Create > ScriptableObjects > System > AudioData** and fill the BGM / SFX dictionaries (`clip`, `multiplier`).
+2. Build the prefab:
+   ```
+   AudioManager      AudioManager · ObjectContainer (MainObjects = [SFX], Amounts = [10])
+   ├── BGM           AudioSource (loop, playOnAwake off)   → AudioManager.bgm.audioSource
+   └── SFX           AudioSource (playOnAwake off)          → AudioManager.sfx.audioSource
+   ```
+   Assign `audioData` and `audioSourcePool`. At runtime `ObjectContainer` clones `SFX` to the pool size.
+3. Put the prefab at the root of the first scene (it calls `DontDestroyOnLoad`). Extra instances in later scenes destroy themselves.
+4. Play: `Locator.Audio?.PlaySfx(SFX_TYPE.CLICK)`, `Locator.Audio?.PlayBgm(BGM_TYPE.HOME)`.
 
 ## Public API index
 
-- `AudioManager` — `MonoBehaviour, IAudioService`. Inspector: `library`, `sfxPoolSize` (default 8), `dontDestroyOnLoad`. Exposes `Library`, `IsBgmMute`, `IsSfxMute`, `CurrentBgm`.
-- `AudioLibrarySO` — `SfxEntry` (`clips[]` picked at random, `volume`, `pitchJitter`, `cooldown`), `BgmEntry` (`clip`, `volume`); `TryGetSfx`, `TryGetBgm`.
-- `SfxSourcePool<T>` — fixed pool; `Rent()` returns a free source or the one rented longest ago.
+- `AudioManager` — `Singleton<AudioManager>, IAudioService`; `AudioData`, `BgmVolume`, `SfxVolume`, `IsBgmMute()`, `IsSfxMute()`.
+- `AudioSourceData` — one channel: `Source`, `currentAudio`, `BaseVolume` (0 = muted, 1 = on), `Volume` (= `BaseVolume * multiplier`), `SetAudio`, `Play`, `Pause`, `Stop`, `IsPlaying`, `IsMute`.
+- `AudioData` — `BgmAudioDict`, `SfxAudioDict`; `Audio { clip, multiplier }`.
 
 ## Known limitations / sharp edges
 
-- The manager does not save mute state; the caller persists it (it lives in `GameData` behind `com.quang.data`, which this package does not reference).
-- A second `AudioManager` destroys its own GameObject; only the first one stays registered.
-- An `SFX_TYPE` with no entry is silent and logs one warning per type in the Editor.
-- `PlayBgm` with the type already playing does nothing; fades run on `Time.unscaledDeltaTime`.
+- Mute flags are read from `GameData.setting` when the manager starts; `ToggleBgmVolume` / `ToggleSfxVolume` do not save (the settings UI saves).
+- `PlayBgm` with the BGM that is already current does nothing; it fades the current BGM out, then switches (no crossfade).
+- `PlaySfx` restarts the current SFX source if all pooled sources are busy; `PlayLoopSfx` returns `null` in that case.
+- `ToggleSfxVolume` does not change sources already looping via `PlayLoopSfx`.
 
 ## Samples
 

@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-11-03T16:53:35Z",
+  "generatedAt": "2026-11-03T17:51:16Z",
   "packages": {
-    "com.quang.audio": "0.1.0",
+    "com.quang.audio": "0.2.0",
     "com.quang.autotest": "0.4.4",
     "com.quang.base": "0.27.0",
     "com.quang.character": "0.2.8",
@@ -40,7 +40,7 @@
     "com.quang.ui",
     "com.quang.utilities"
   ],
-  "releaseTag": "release-2026.11.03.1",
+  "releaseTag": "release-2026.11.03.2",
   "schemaVersion": 1,
-  "sourceCommit": "246027b15d619fe74fe88ae4658b44af0dac8f88"
+  "sourceCommit": "b60d8d24dd76a48478de96377fddce801bf89a9f"
 }

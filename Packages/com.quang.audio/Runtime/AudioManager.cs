@@ -1,64 +1,142 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
+using DesignPattern;
 using Quang.Base;
+using Quang.DesignPattern;
 using UnityEngine;
 
 namespace Quang.Audio
 {
-    /// <summary>
-    /// Default <see cref="IAudioService"/>: registers itself as <see cref="Locator.Audio"/>, plays pooled SFX,
-    /// crossfades BGM between two sources and applies mute. It does not persist mute state; the caller does.
-    /// Fades use unscaled time so they keep running while the game is paused.
-    /// </summary>
-    [DisallowMultipleComponent]
-    public class AudioManager : MonoBehaviour, IAudioService
+    [Serializable]
+    public struct AudioSourceData
     {
-        [SerializeField] private AudioLibrarySO library;
-        [SerializeField, Min(1)] private int sfxPoolSize = 8;
-        [SerializeField] private bool dontDestroyOnLoad = true;
+        [SerializeField]
+        private AudioSource audioSource;
 
-        private readonly AudioSource[] bgmSources = new AudioSource[2];
-        private readonly Dictionary<AudioSource, SFX_TYPE> sfxTypeBySource = new();
-        private readonly Dictionary<SFX_TYPE, float> lastPlayTime = new();
-        private readonly List<AudioSource> loopSources = new();
-        private readonly Dictionary<AudioSource, Coroutine> fades = new();
-        private SfxSourcePool<AudioSource> sfxPool;
-        private int activeBgm;
-        private BGM_TYPE currentBgm = BGM_TYPE.NONE;
-        private bool isBgmMute;
-        private bool isSfxMute;
-        private bool initialized;
-#if UNITY_EDITOR
-        private readonly HashSet<SFX_TYPE> warnedMissing = new();
-#endif
+        /// <summary>Set by <see cref="AudioManager"/> for the SFX channel: returns a free pooled source when the current one is busy.</summary>
+        [NonSerialized]
+        public Func<AudioSource, AudioSource> rentFreeSource;
 
-        internal Func<float> Clock = () => Time.unscaledTime;
-        internal event Action<SFX_TYPE> SfxPlayed;
+        public Audio currentAudio;
 
-        public AudioLibrarySO Library
+        [SerializeField] private float baseVolume;
+
+        public AudioSource Source
         {
-            get => library;
-            set => library = value;
+            get => audioSource;
+            set => audioSource = value;
         }
-        public bool IsBgmMute => isBgmMute;
-        public bool IsSfxMute => isSfxMute;
-        public BGM_TYPE CurrentBgm => currentBgm;
 
-        protected virtual void Awake()
+        public void SetLoop(bool loop)
         {
-            if (!Initialize()) return;
-            if (dontDestroyOnLoad && Application.isPlaying)
+            audioSource.loop = loop;
+        }
+
+        public void SetAudio(Audio audio)
+        {
+            if (audio is null) return;
+            if (rentFreeSource != null)
             {
-                if (transform.parent == null) DontDestroyOnLoad(gameObject);
-                else Debug.LogWarning("[AudioManager] dontDestroyOnLoad needs a root GameObject; skipped.", this);
+                audioSource = rentFreeSource(audioSource);
+            }
+            if (audioSource == null) return;
+
+            currentAudio = audio;
+            audioSource.clip = audio.clip;
+            Volume = audio.multiplier;
+        }
+
+        public void Play()
+        {
+            if (audioSource != null) audioSource.Play();
+        }
+
+        public void Pause()
+        {
+            if (audioSource != null) audioSource.Pause();
+        }
+
+        public void Stop()
+        {
+            if (audioSource != null) audioSource.Stop();
+        }
+
+        public bool IsPlaying => audioSource != null && audioSource.isPlaying;
+
+        public float BaseVolume
+        {
+            get => baseVolume;
+            set
+            {
+                baseVolume = value;
+                Volume = currentAudio?.multiplier ?? 1;
             }
         }
 
-        protected virtual void OnDestroy() => Shutdown();
+        public float Volume
+        {
+            get => audioSource.volume;
+            set => audioSource.volume = baseVolume * value;
+        }
 
-        /// <summary>Registers with <see cref="Locator"/> and builds the sources. Returns false (and destroys this object) when another manager is registered.</summary>
-        internal bool Initialize()
+        public bool IsMute => audioSource.volume < 0.01 || audioSource.mute;
+    }
+
+    /// <summary>
+    /// Default <see cref="IAudioService"/>. Prefab: this component + <see cref="ObjectContainer"/> (MainObjects = [SFX]),
+    /// children <c>BGM</c> and <c>SFX</c> with one <see cref="AudioSource"/> each. Reads saved mute flags from
+    /// <see cref="GameData"/> on start; <see cref="ToggleBgmVolume"/>/<see cref="ToggleSfxVolume"/> do not save.
+    /// </summary>
+    public class AudioManager : Singleton<AudioManager>, IAudioService
+    {
+        [SerializeField] private AudioData audioData;
+        [SerializeField] private ObjectContainer audioSourcePool;
+
+        [SerializeField] private AudioSourceData bgm;
+        [SerializeField] private AudioSourceData sfx;
+
+        private List<AudioSource> loopSfxAudioSource = new();
+        private readonly HashSet<AudioSource> poppedSources = new();
+        private int poolSize;
+        private Tween bgmTween;
+        private bool initialized;
+
+        internal Func<AudioSource, bool> IsSourceBusy = source => source.isPlaying;
+
+        public AudioData AudioData
+        {
+            get => audioData;
+            set => audioData = value;
+        }
+        internal ObjectContainer AudioSourcePool
+        {
+            get => audioSourcePool;
+            set => audioSourcePool = value;
+        }
+        internal AudioSourceData Bgm => bgm;
+        internal AudioSourceData Sfx => sfx;
+
+        internal void SetSources(AudioSource bgmSource, AudioSource sfxSource)
+        {
+            bgm.Source = bgmSource;
+            sfx.Source = sfxSource;
+        }
+
+        protected void Awake()
+        {
+            if (!Init()) return;
+            if (transform.parent == null) DontDestroyOnLoad(gameObject);
+        }
+
+        protected void OnDestroy()
+        {
+            bgmTween?.Kill();
+            if (ReferenceEquals(Locator.Audio, this)) Locator.Audio = null;
+        }
+
+        /// <summary>Returns false (and destroys this object) when another manager is already registered.</summary>
+        internal bool Init()
         {
             if (initialized) return true;
 
@@ -69,51 +147,104 @@ namespace Quang.Audio
                 return false;
             }
 
+            audioSourcePool.OnInit();
+            poolSize = audioSourcePool.Amounts.Length > 0 ? audioSourcePool.Amounts[0] : 0;
+            sfx.rentFreeSource = RentFreeSfxSource;
+            AudioSource first = TryPop();
+            if (first != null) sfx.Source = first;
+            loopSfxAudioSource = new List<AudioSource>();
+
+            GameData data = Locator.Data?.GetData<GameData>();
+            bgm.BaseVolume = data != null && data.setting.isBgmMute ? 0 : 1;
+            sfx.BaseVolume = data != null && data.setting.isSfxMute ? 0 : 1;
+
             Locator.Audio = this;
-
-            for (int i = 0; i < bgmSources.Length; i++)
-            {
-                bgmSources[i] = CreateSource(true);
-            }
-
-            var pooled = new List<AudioSource>(sfxPoolSize);
-            for (int i = 0; i < Mathf.Max(1, sfxPoolSize); i++)
-            {
-                pooled.Add(CreateSource(false));
-            }
-            sfxPool = new SfxSourcePool<AudioSource>(pooled, source => source.isPlaying);
-
             initialized = true;
             return true;
         }
 
-        internal void Shutdown()
+        public float BgmVolume => bgm.BaseVolume;
+        public float SfxVolume => sfx.BaseVolume;
+
+        private Audio GetBgmAudio(BGM_TYPE type)
         {
-            if (ReferenceEquals(Locator.Audio, this)) Locator.Audio = null;
+            return audioData != null ? GetAudio(audioData.BgmAudioDict, type) : null;
         }
 
-        #region SFX
+        private Audio GetSfxAudio(SFX_TYPE type)
+        {
+            return audioData != null ? GetAudio(audioData.SfxAudioDict, type) : null;
+        }
+
+        private static Audio GetAudio<T>(IReadOnlyDictionary<T, Audio> audioDictionary, T type)
+        {
+            return audioDictionary.GetValueOrDefault(type);
+        }
+
+        public void PlayBgm(BGM_TYPE type, float fadeOut = 0.3f)
+        {
+            Audio audioIn = GetBgmAudio(type);
+            if (audioIn is null) return;
+            if (audioIn == bgm.currentAudio) return;
+            bgm.SetLoop(true);
+            bgmTween?.Kill();
+            if (fadeOut <= 0f || bgm.IsMute || !bgm.IsPlaying)
+            {
+                bgm.SetAudio(audioIn);
+                bgm.Play();
+            }
+            else
+            {
+                bgmTween = DOVirtual.Float(bgm.currentAudio.multiplier, 0, fadeOut, value => bgm.Volume = value)
+                    .SetEase(Ease.Linear)
+                    .SetUpdate(true)
+                    .OnComplete(() =>
+                    {
+                        bgm.SetAudio(audioIn);
+                        bgm.Play();
+                    });
+            }
+        }
 
         public void PlaySfx(SFX_TYPE type)
         {
-            if (!initialized || isSfxMute || type == SFX_TYPE.NONE) return;
-            if (!TryGetSfx(type, out AudioLibrarySO.SfxEntry entry)) return;
+            Audio audioIn = GetSfxAudio(type);
+            if (audioIn is null) return;
+            sfx.SetAudio(audioIn);
+            sfx.Play();
+        }
 
-            AudioClip clip = entry.PickClip();
-            if (clip == null) return;
+        public AudioSource PlayLoopSfx(SFX_TYPE type, float fadeIn = 0.3f)
+        {
+            Audio audioIn = GetSfxAudio(type);
+            if (audioIn is null) return null;
 
-            float now = Clock();
-            if (lastPlayTime.TryGetValue(type, out float last) && now - last < entry.cooldown) return;
-            lastPlayTime[type] = now;
+            AudioSource audioSource = TryPop();
+            if (audioSource == null) return null;
 
-            AudioSource source = sfxPool.Rent();
-            source.Stop();
-            source.clip = clip;
-            source.volume = entry.volume;
-            source.pitch = 1f + UnityEngine.Random.Range(-entry.pitchJitter, entry.pitchJitter);
-            source.Play();
-            sfxTypeBySource[source] = type;
-            SfxPlayed?.Invoke(type);
+            float volume = audioIn.multiplier * sfx.BaseVolume;
+            audioSource.clip = audioIn.clip;
+            audioSource.loop = true;
+            audioSource.volume = 0;
+            DOVirtual.Float(0, volume, fadeIn, x => audioSource.volume = x).SetEase(Ease.Linear).SetUpdate(true);
+            loopSfxAudioSource.Add(audioSource);
+            audioSource.Play();
+            return audioSource;
+        }
+
+        public void StopLoopSfx(AudioSource source, float fadeOut = 0.3f)
+        {
+            if (source == null || !loopSfxAudioSource.Contains(source)) return;
+            DOVirtual.Float(source.volume, 0, fadeOut, x => source.volume = x)
+                .SetEase(Ease.Linear)
+                .SetUpdate(true)
+                .OnComplete(() =>
+                {
+                    source.loop = false;
+                    source.Stop();
+                    loopSfxAudioSource.Remove(source);
+                    PushBack(source);
+                });
         }
 
         public void PlayRandomSfx(List<SFX_TYPE> sfxTypes)
@@ -122,184 +253,72 @@ namespace Quang.Audio
             PlaySfx(sfxTypes[UnityEngine.Random.Range(0, sfxTypes.Count)]);
         }
 
-        public AudioSource PlayLoopSfx(SFX_TYPE type, float fadeIn = 0.1f)
-        {
-            if (!initialized || !TryGetSfx(type, out AudioLibrarySO.SfxEntry entry)) return null;
-
-            AudioClip clip = entry.PickClip();
-            if (clip == null) return null;
-
-            AudioSource source = loopSources.Find(s => !s.isPlaying && !fades.ContainsKey(s));
-            if (source == null)
-            {
-                source = CreateSource(true);
-                loopSources.Add(source);
-            }
-
-            source.clip = clip;
-            source.mute = isSfxMute;
-            source.volume = 0f;
-            source.Play();
-            Fade(source, entry.volume, fadeIn, null);
-            return source;
-        }
-
-        public void StopLoopSfx(AudioSource source, float fadeOut = 0.1f)
-        {
-            if (source == null || !loopSources.Contains(source)) return;
-            Fade(source, 0f, fadeOut, source.Stop);
-        }
-
-        public void StopSfx(SFX_TYPE type = SFX_TYPE.NONE)
-        {
-            if (!initialized) return;
-
-            foreach (AudioSource source in sfxPool.Items)
-            {
-                if (type == SFX_TYPE.NONE || (sfxTypeBySource.TryGetValue(source, out SFX_TYPE playing) && playing == type))
-                {
-                    source.Stop();
-                }
-            }
-
-            if (type != SFX_TYPE.NONE) return;
-            foreach (AudioSource source in loopSources)
-            {
-                CancelFade(source);
-                source.Stop();
-            }
-        }
-
-        public void ToggleSfxVolume(bool isMute)
-        {
-            isSfxMute = isMute;
-            if (!initialized) return;
-            foreach (AudioSource source in sfxPool.Items)
-            {
-                source.mute = isMute;
-            }
-            foreach (AudioSource source in loopSources)
-            {
-                source.mute = isMute;
-            }
-        }
-
-        #endregion
-
-        #region BGM
-
-        public void PlayBgm(BGM_TYPE type, float fadeOut = 0.3f)
-        {
-            if (!initialized) return;
-            if (type == BGM_TYPE.NONE)
-            {
-                StopBgm();
-                return;
-            }
-            if (library == null || !library.TryGetBgm(type, out AudioLibrarySO.BgmEntry entry) || entry.clip == null)
-            {
-                Debug.LogWarning($"[AudioManager] No BGM clip for {type}.", this);
-                return;
-            }
-            if (currentBgm == type && bgmSources[activeBgm].isPlaying) return;
-
-            AudioSource previous = bgmSources[activeBgm];
-            activeBgm = 1 - activeBgm;
-            AudioSource next = bgmSources[activeBgm];
-
-            next.clip = entry.clip;
-            next.volume = 0f;
-            next.Play();
-            Fade(next, entry.volume, fadeOut, null);
-            if (previous.isPlaying) Fade(previous, 0f, fadeOut, previous.Stop);
-            currentBgm = type;
-        }
-
         public void PauseBgm()
         {
-            if (initialized) bgmSources[activeBgm].Pause();
+            bgm.Pause();
         }
 
         public void UnPauseBgm()
         {
-            if (initialized) bgmSources[activeBgm].UnPause();
+            bgm.Play();
         }
 
         public void StopBgm()
         {
-            if (!initialized) return;
-            foreach (AudioSource source in bgmSources)
+            bgm.Stop();
+        }
+
+        public void StopSfx(SFX_TYPE type = SFX_TYPE.NONE)
+        {
+            if (type == SFX_TYPE.NONE)
             {
-                CancelFade(source);
-                source.Stop();
+                sfx.Stop();
+                return;
             }
-            currentBgm = BGM_TYPE.NONE;
+            if (sfx.currentAudio != GetSfxAudio(type)) return;
+            sfx.Stop();
+        }
+
+        public bool IsBgmMute()
+        {
+            return bgm.IsMute;
+        }
+
+        public bool IsSfxMute()
+        {
+            return sfx.IsMute;
         }
 
         public void ToggleBgmVolume(bool isMute)
         {
-            isBgmMute = isMute;
-            if (!initialized) return;
-            foreach (AudioSource source in bgmSources)
-            {
-                source.mute = isMute;
-            }
+            bgm.BaseVolume = isMute ? 0 : 1;
         }
 
-        #endregion
-
-        private bool TryGetSfx(SFX_TYPE type, out AudioLibrarySO.SfxEntry entry)
+        public void ToggleSfxVolume(bool isMute)
         {
-            if (library != null && library.TryGetSfx(type, out entry)) return true;
-            entry = null;
-#if UNITY_EDITOR
-            if (warnedMissing.Add(type))
-            {
-                Debug.LogWarning($"[AudioManager] No SFX entry for {type}.", this);
-            }
-#endif
-            return false;
+            sfx.BaseVolume = isMute ? 0 : 1;
         }
 
-        private AudioSource CreateSource(bool loop)
+        // SFX channel: keep the current source while it is free; otherwise return it to the pool and take another.
+        // When every pooled source is busy, the current one is reused (restarted) instead of throwing.
+        private AudioSource RentFreeSfxSource(AudioSource current)
         {
-            AudioSource source = gameObject.AddComponent<AudioSource>();
-            source.playOnAwake = false;
-            source.loop = loop;
-            source.mute = loop ? isBgmMute : isSfxMute;
+            if (current != null && !IsSourceBusy(current)) return current;
+            if (current != null) PushBack(current);
+            return TryPop() ?? current;
+        }
+
+        private AudioSource TryPop()
+        {
+            if (poppedSources.Count >= poolSize) return null;
+            AudioSource source = audioSourcePool.Pop(0).AudioSource;
+            poppedSources.Add(source);
             return source;
         }
 
-        private void Fade(AudioSource source, float target, float duration, Action onDone)
+        private void PushBack(AudioSource source)
         {
-            CancelFade(source);
-            if (duration <= 0f || !isActiveAndEnabled || !Application.isPlaying)
-            {
-                source.volume = target;
-                onDone?.Invoke();
-                return;
-            }
-            fades[source] = StartCoroutine(FadeRoutine(source, target, duration, onDone));
-        }
-
-        private void CancelFade(AudioSource source)
-        {
-            if (!fades.TryGetValue(source, out Coroutine routine)) return;
-            if (routine != null) StopCoroutine(routine);
-            fades.Remove(source);
-        }
-
-        private IEnumerator FadeRoutine(AudioSource source, float target, float duration, Action onDone)
-        {
-            float start = source.volume;
-            for (float t = 0f; t < duration; t += Time.unscaledDeltaTime)
-            {
-                source.volume = Mathf.Lerp(start, target, t / duration);
-                yield return null;
-            }
-            source.volume = target;
-            fades.Remove(source);
-            onDone?.Invoke();
+            if (poppedSources.Remove(source)) audioSourcePool.Push(0, source.transform);
         }
     }
 }

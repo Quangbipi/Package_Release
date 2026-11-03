@@ -1,13 +1,15 @@
 {
   "name": "com.quang.audio",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "displayName": "Quang Audio",
-  "description": "Audio service: AudioManager implements IAudioService (pooled SFX, crossfaded BGM, mute) from an AudioLibrarySO mapping SFX_TYPE/BGM_TYPE to clips.",
+  "description": "Audio service: AudioManager implements IAudioService with a BGM source and a pooled SFX source (ObjectContainer), DOTween fades and saved mute flags, driven by an Odin AudioData asset mapping BGM_TYPE/SFX_TYPE to clips.",
   "unity": "2022.3",
   "keywords": [
     "layer:4"
   ],
   "dependencies": {
-    "com.quang.base": "0.27.0"
+    "com.quang.base": "0.27.0",
+    "com.quang.data": "0.12.6",
+    "com.quang.designpattern": "0.4.5"
   }
 }
