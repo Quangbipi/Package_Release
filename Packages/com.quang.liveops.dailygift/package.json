@@ -1,6 +1,6 @@
 {
   "name": "com.quang.liveops.dailygift",
-  "version": "0.4.8",
+  "version": "0.4.9",
   "displayName": "Quang LiveOps DailyGift",
   "description": "Daily gift LiveOps feature: manager, popups, install prefab. Contracts live in com.quang.base, data models in com.quang.data.",
   "unity": "2022.3",

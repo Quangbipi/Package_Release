@@ -37,5 +37,14 @@ namespace Quang.UI.Tests
             Assert.AreEqual(Vector2.zero, min);
             Assert.AreEqual(Vector2.one, max);
         }
+
+        [Test]
+        public void ComputeAnchors_SafeAreaLargerThanScreen_ReturnsFullScreen()
+        {
+            SafeAreaFitter.ComputeAnchors(new Rect(0f, 102f, 1170f, 2289f), new Vector2(904f, 589f), out Vector2 min, out Vector2 max);
+
+            Assert.AreEqual(Vector2.zero, min);
+            Assert.AreEqual(Vector2.one, max);
+        }
     }
 }

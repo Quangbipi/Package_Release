@@ -1,24 +1,24 @@
 {
-  "generatedAt": "2026-11-03T17:51:16Z",
+  "generatedAt": "2026-11-11T18:18:50Z",
   "packages": {
     "com.quang.audio": "0.2.0",
-    "com.quang.autotest": "0.4.4",
+    "com.quang.autotest": "0.4.5",
     "com.quang.base": "0.27.0",
     "com.quang.character": "0.2.8",
     "com.quang.data": "0.12.6",
     "com.quang.designpattern": "0.4.5",
-    "com.quang.framework": "0.1.2",
-    "com.quang.liveops.dailygift": "0.4.8",
-    "com.quang.liveops.energy": "0.2.8",
+    "com.quang.framework": "0.2.0",
+    "com.quang.liveops.dailygift": "0.4.9",
+    "com.quang.liveops.energy": "0.2.9",
     "com.quang.persistence": "0.1.0",
-    "com.quang.services.ads": "0.8.3",
+    "com.quang.services.ads": "0.8.4",
     "com.quang.services.analytics": "0.5.1",
-    "com.quang.services.iap": "0.7.5",
+    "com.quang.services.iap": "0.7.6",
     "com.quang.sync": "0.1.0",
     "com.quang.sync.simulator": "0.1.0",
     "com.quang.tools": "0.11.0",
-    "com.quang.ui": "0.9.0",
-    "com.quang.utilities": "0.2.2"
+    "com.quang.ui": "0.10.0",
+    "com.quang.utilities": "0.3.0"
   },
   "publicRoots": [
     "com.quang.audio",
@@ -40,7 +40,7 @@
     "com.quang.ui",
     "com.quang.utilities"
   ],
-  "releaseTag": "release-2026.11.03.2",
+  "releaseTag": "release-2026.11.11.1",
   "schemaVersion": 1,
-  "sourceCommit": "b60d8d24dd76a48478de96377fddce801bf89a9f"
+  "sourceCommit": "08fe740cb31e5f7516c04324022b066c87d1a26c"
 }

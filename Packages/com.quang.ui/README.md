@@ -17,7 +17,7 @@ UI framework: `UIManager` facade, `UISCanvas`/`UICanvasComponent` lifecycle, can
 ## Layer + dependencies
 
 - Layer: `4`
-- Dependencies: `com.quang.designpattern` 0.4.4, `com.quang.utilities` 0.2.2, `com.quang.base` 0.21.1, Addressables 1.22.3 minimum
+- Dependencies: `com.quang.designpattern` 0.4.4, `com.quang.utilities` 0.3.0, `com.quang.base` 0.21.1, Addressables 1.22.3 minimum
 
 ## Prerequisites
 
@@ -38,7 +38,10 @@ Register canvases with `CanvasRegistry`, open/close them through `UIManager`, an
 - `IUIPrefabProvider` / `ResourcesPrefabProvider` — pluggable prefab resolution (swap for Addressables, etc.)
 - `UISButton` / `UIButtonComponent` — button widgets
 - `UIDropdown` — dropdown widget
-- `SafeAreaFitter` — fits a stretched `RectTransform` to `Screen.safeArea`; keep backgrounds outside it and interactive content inside
+- `SafeAreaFitter` — fits a stretched `RectTransform` to `Screen.safeArea` via `Quang.Utilities.SafeAreaMath`; keep backgrounds outside it and interactive content inside. World code that must line up with the HUD reads `SafeAreaMath.Current()`
+- `UniformScaleFitter` — uniform scale-to-fit for the one flexible zone of a responsive screen (`designSize`, `maxScale`)
+- `CanvasScalerMath` — canvas size a Scale With Screen Size scaler gives for a screen
+- Editor (`Quang.UI.Editor`): `MockupProbe` (measure a mockup in canvas units), `ResponsivePreview` + `PreviewDevice` (render a canvas prefab on a device matrix). Workflow: `com.quang.framework` skill `responsive-ui`
 - `UISCanvasTransition` — show/hide transition driver
 
 Public addressed acquisition types: `IUIAsyncPrefabProvider`, `IUIAddressResolver`, `UIPrefabLease`, `AddressablesUIPrefabProvider`, `AsyncCanvasRegistry`, `UIAcquireResult<T>`, and `UIAcquireFailure`. `UIManager.SetAsyncProvider` and `UIManager.AcquireAsync<T>` are the facade entry points.

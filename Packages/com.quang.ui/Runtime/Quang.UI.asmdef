@@ -4,6 +4,7 @@
     "references": [
         "Quang.Base",
         "Quang.DesignPattern",
+        "Quang.Utilities",
         "Quang.Utilities.STimer",
         "DOTween.Modules",
         "Unity.TextMeshPro",

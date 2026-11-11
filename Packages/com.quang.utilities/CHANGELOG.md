@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.3.0] - 2026-11-12
+- Added `SafeAreaMath` (`Normalize(Rect, Vector2)`, `Current()`): the single safe-area rule for UI and world layout. Treats a zero-size screen, an empty safe area, or a safe area larger than the screen (Editor Game view) as no inset. Covered by `SafeAreaMathTests`.
+
 ## [0.2.2] - 2026-08-09
 - Dependency-only patch: align exact package constraints for the approved F3B propagation; no runtime or API behavior changed.
 - Dependency alignment: com.quang.designpattern 0.4.2 -> 0.4.3.

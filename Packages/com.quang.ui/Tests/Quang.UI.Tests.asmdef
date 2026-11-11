@@ -4,6 +4,7 @@
     "Quang.UI",
     "Quang.Base",
     "Quang.DesignPattern",
+    "Quang.Utilities",
     "UnityEngine.TestRunner",
     "UnityEditor.TestRunner"
   ],

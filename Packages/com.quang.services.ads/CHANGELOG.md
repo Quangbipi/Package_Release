@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.8.4] - 2026-11-12
+- Packaging only: `AI~` is now included in releases (a global `*~` git ignore had dropped it from every published commit). No code changes.
+
 ## [0.8.3] - 2026-10-08
 
 ### Documentation

@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.4.9] - 2026-11-12
+- Packaging only: `Samples~` is now included in releases (a global `*~` git ignore had dropped it from every published commit). No code changes.
+
 ## [0.4.8] - 2026-09-28
 - Dependency alignment: com.quang.ui 0.7.1 -> 0.7.2.
 

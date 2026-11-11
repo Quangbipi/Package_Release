@@ -1,3 +1,4 @@
+using Quang.Utilities;
 using UnityEngine;
 
 namespace Quang.UI
@@ -43,19 +44,15 @@ namespace Quang.UI
         }
 
         /// <summary>
-        /// Converts a safe area in screen pixels to normalized anchors. Returns full-screen anchors for a zero-size screen.
+        /// Converts a safe area in screen pixels to normalized anchors via <see cref="SafeAreaMath.Normalize"/>.
+        /// Returns full-screen anchors for a zero-size screen, an empty safe area, or a safe area larger than
+        /// the screen (Editor Game view reporting a simulated device's safe area).
         /// </summary>
         public static void ComputeAnchors(Rect safeArea, Vector2 screenSize, out Vector2 min, out Vector2 max)
         {
-            if (screenSize.x <= 0f || screenSize.y <= 0f)
-            {
-                min = Vector2.zero;
-                max = Vector2.one;
-                return;
-            }
-
-            min = new Vector2(Mathf.Clamp01(safeArea.xMin / screenSize.x), Mathf.Clamp01(safeArea.yMin / screenSize.y));
-            max = new Vector2(Mathf.Clamp01(safeArea.xMax / screenSize.x), Mathf.Clamp01(safeArea.yMax / screenSize.y));
+            Rect normalized = SafeAreaMath.Normalize(safeArea, screenSize);
+            min = normalized.min;
+            max = normalized.max;
         }
     }
 }

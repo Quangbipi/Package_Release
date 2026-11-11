@@ -1,6 +1,6 @@
 {
   "name": "com.quang.framework",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "displayName": "Quang Framework AI Docs",
   "description": "Doc-only package: AI rules, knowledge, playbooks, tools and skills for projects built on the ComQuang framework. claude-unity-shared sync.ps1 installs its AI~ folder into a project; Unity ignores AI~.",
   "unity": "2022.3",

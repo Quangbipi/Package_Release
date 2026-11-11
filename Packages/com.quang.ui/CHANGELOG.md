@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.10.0] - 2026-11-12
+- Requires com.quang.utilities 0.3.0; `Quang.UI` references `Quang.Utilities`.
+- **Behaviour change (Editor only):** `SafeAreaFitter.ComputeAnchors` uses `SafeAreaMath.Normalize`; a safe area larger than the screen (Editor Game view reporting the simulated device for a smaller view) now gives full-screen anchors instead of clamped, wrong insets. Device results are unchanged.
+- Added `UniformScaleFitter`: scales a fixed-size content node uniformly to fit its parent (capped at `maxScale`), for the one flexible zone of a responsive screen. Script GUID `bbf61d0046df54b7abb2042911225406` carried over from Conveyor Unjam so existing prefabs keep the component.
+- Added `CanvasScalerMath` (`ScaleFactor`, `CanvasSize`): the Scale With Screen Size / Match Width Or Height formula.
+- Added Editor assembly `Quang.UI.Editor`: `MockupProbe.MeasureRows` (mockup → content bands in canvas units), `ResponsivePreview.Render/RenderAll` (render a canvas prefab to PNG on a device matrix using the project's CanvasScaler and simulated safe-area insets), `PreviewDevice.Defaults` (16:9, reference iPhone, 20:9, notched iPhone, iPad).
+- Tests: `SafeAreaFitterTests` (Editor safe-area case), `UniformScaleFitterTests`, `CanvasScalerMathTests`.
+
 ## [0.9.0] - 2026-11-01
 - Added `SafeAreaFitter`: fits a `RectTransform` to `Screen.safeArea` (notch, home indicator) by driving its anchors, and reapplies when the safe area or screen size changes. Static `ComputeAnchors` is covered by EditMode tests.
 
