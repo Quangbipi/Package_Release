@@ -1,0 +1,3 @@
+
+# Unity package folders ending in ~ are package content, not editor backups (the global ignore has *~).
+!Packages/com.quang.framework/AI~/

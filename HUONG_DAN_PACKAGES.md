@@ -51,15 +51,15 @@
 | Package | Phiên bản | Layer | Một câu mô tả |
 |---|---|---|---|
 | `com.quang.designpattern` | 0.4.5 | 0 | Pool, EventBus, StateMachine, Singleton, Observer, Command… |
-| `com.quang.utilities` | 0.2.2 | 0 | Hàm tiện ích, Math, JSON (LitJson), Timer (STimer) |
-| `com.quang.framework` | 0.1.2 | 0 | Chỉ chứa tài liệu/rule/skill cho AI (Claude/Cursor), không có code |
+| `com.quang.utilities` | 0.3.0 | 0 | Hàm tiện ích, Math, JSON (LitJson), Timer (STimer), Safe area |
+| `com.quang.framework` | 0.2.0 | 0 | Chỉ chứa tài liệu/rule/skill cho AI (Claude/Cursor), không có code |
 | `com.quang.persistence` | 0.1.0 | 1 | Cơ chế lưu file an toàn: atomic write, backup, HMAC, migration |
 | `com.quang.base` | 0.26.0 | 1 | `Locator` + toàn bộ interface service, init flow, Stats, GameData |
 | `com.quang.sync` | 0.1.0 | 1 | Hàng đợi đồng bộ thao tác lên server (idempotent, retry, conflict) |
 | `com.quang.sync.simulator` | 0.1.0 | 1 | Server giả lập trong bộ nhớ để test `sync` — **chỉ dùng dev/test** |
 | `com.quang.data` | 0.12.6 | 2 | ScriptableObject data, ItemCatalog, DataManager, bootstrap lưu trữ |
 | `com.quang.character` | 0.2.8 | 3 | Nhân vật dạng module + BrainGraph (AI node-graph có editor riêng) |
-| `com.quang.ui` | 0.8.0 | 4 | `UIManager`, vòng đời canvas, hiệu ứng chuyển cảnh, widget |
+| `com.quang.ui` | 0.10.0 | 4 | `UIManager`, vòng đời canvas, hiệu ứng chuyển cảnh, widget, responsive UI |
 | `com.quang.services.analytics` | 0.5.1 | 4 | Một proxy analytics gửi tới Firebase/AppsFlyer/AppMetrica/GameAnalytics |
 | `com.quang.services.ads` | 0.8.3 | 4 | Quảng cáo Reward/Inter/Banner, tách vendor (LevelPlay/MAX/AdMob) |
 | `com.quang.services.iap` | 0.7.5 | 4 | Pipeline mua hàng an toàn trên Unity Purchasing v5 |
@@ -216,6 +216,7 @@ Gom các hàm tiện ích nhỏ, toán học, JSON và bộ hẹn giờ để kh
 | `ThirdParty/LitJson` (`Quang.Utilities.Json`) | Thư viện JSON LitJson (`JsonMapper`, `JsonData`) |
 | `MainThreadDispatcher` | Đẩy callback từ thread khác (SDK) về main thread của Unity |
 | `VFXController`, `VFXObject`, `VFXColor`, `Gradient`, `PosYToSortingOrder` | Tiện ích hiển thị: điều khiển VFX, gradient UI, sắp sorting order theo trục Y (game 2D top-down) |
+| `SafeAreaMath` | Safe area (tai thỏ, home indicator) chuẩn hoá 0..1: `Current()`, `Normalize(safeArea, screen)`. Một quy tắc duy nhất cho cả UI (`SafeAreaFitter`) và layout world; coi safe area lớn hơn màn hình (Game view của Editor) là không có inset |
 
 ### Cách dùng
 
@@ -258,7 +259,7 @@ Là package **chỉ chứa tài liệu** dành cho trợ lý AI (Claude Code, Cu
 | `AI~/rules/` | luôn luôn (thành `.claude/rules/pkg-framework-*.md`) | Quy tắc compile-gate, MCP, test, bug-ledger, C# style |
 | `AI~/knowledge/` | khi cần | Kiến thức "cái gì đúng và vì sao" |
 | `AI~/playbooks/` | khi cần | Quy trình từng bước |
-| `AI~/tools/`, `AI~/skills/`, `AI~/hooks/` | thành `.claude/tools|skills|hooks/pkg-framework-*` | Script và skill (vd. `find-bug`, `unity-csproj-sync`) |
+| `AI~/tools/`, `AI~/skills/`, `AI~/hooks/` | thành `.claude/tools|skills|hooks/pkg-framework-*` | Script và skill (`find-bug`, `unity-csproj-sync`, `responsive-ui`) |
 
 Thư mục có dấu `~` (`AI~`) bị Unity bỏ qua, nên không ảnh hưởng build.
 
@@ -267,6 +268,8 @@ Thư mục có dấu `~` (`AI~`) bị Unity bỏ qua, nên không ảnh hưởng
 2. Chạy script `sync.ps1` của bộ `claude-unity-shared` để copy nội dung `AI~` vào thư mục `.claude/` của project.
 3. Giá trị riêng của từng project đặt ở `.claude/rules/project-values.md`.
 4. **Không sửa** các bản copy đã sinh trong project — muốn đổi thì sửa trong package, tăng version, release lại.
+
+**Skill `responsive-ui`** (từ 0.2.0): quy trình dựng màn uGUI theo mockup và responsive trên điện thoại / tai thỏ / iPad. Chép `AI~/skills/responsive-ui` thành `.agents/skills/pkg-framework-responsive-ui`, thêm mục `## responsive-ui` vào `project-values.md` theo `project-values-template.md`. Cần `com.quang.ui` ≥ 0.10.0.
 
 ---
 
@@ -536,6 +539,8 @@ Quản lý toàn bộ màn hình/popup: mở, đóng, back stack, hiệu ứng x
 | Hiệu ứng | `UISCanvasTransition`, `UIAnim`, `UIAlphaAnim`, `UIScaleAnim`, `UIPositionAnim`, `UIPunchAnim` | Hiệu ứng SHOW/HIDE/IDLE, xếp hàng và ngắt an toàn |
 | Nạp prefab | `IUIPrefabProvider`, `ResourcesPrefabProvider`, `AddressablesUIPrefabProvider`, `CanvasRegistry`, `AsyncCanvasRegistry`, `IUIAddressResolver` | Nạp từ Resources (mặc định) hoặc Addressables |
 | Widget | `UIButton`, `UISButton`, `UIButtonComponent`, `ImageStateButtonComponent`, `TextsStateButtonComponent`, `Type4ButtonComponent`, `UIDropdown`, `UIItem`, `MaskRaycastImage` | Nút, nút đổi trạng thái, dropdown, ô item |
+| Responsive | `SafeAreaFitter`, `UniformScaleFitter`, `CanvasScalerMath` | Neo node `SafeArea` theo safe area; thu nhỏ đều vùng co giãn; tính kích thước canvas của CanvasScaler |
+| Editor | `MockupProbe`, `ResponsivePreview`, `PreviewDevice` (`Quang.UI.Editor`) | Đo mockup ra canvas unit; render prefab ra PNG trên 5 thiết bị chuẩn (16:9, iPhone, 20:9, tai thỏ, iPad) |
 | Khác | `RecyclableScrollRect` (bên thứ ba), `UIParticleSystem`, `DetectMouse` | Scroll view tái sử dụng ô cho danh sách dài, particle trên UI |
 
 ### Cách dùng
@@ -575,6 +580,19 @@ var result = await UIManager.Ins.AcquireAsync<ShopPopup>("UI/ShopPopup");
 **Các điểm cần biết:**
 - `UICanvas.Scope` mặc định `Global`. Đặt scope cụ thể để canvas tự đóng khi `UiScopeRegistry.Enter(path)` chuyển sang phạm vi khác.
 - `UIButton.DefaultClickSfx` (static) bật/tắt âm click mặc định; override `PlaysClickSfx` cho từng nút.
+
+**Responsive UI** (0.10.0, quy trình đầy đủ: skill `responsive-ui` của `com.quang.framework`):
+
+```csharp
+// Canvas: Background stretch ngoài; node SafeArea stretch + SafeAreaFitter chứa mọi thứ bấm/đọc.
+// Một vùng co giãn: node nội dung kích thước cố định + UniformScaleFitter (designSize, maxScale = 1).
+// Code world cần khớp HUD:
+Rect safe = Quang.Utilities.SafeAreaMath.Current();
+
+// Editor (Unity MCP execute_code hoặc menu tool riêng):
+Quang.UI.Editor.MockupProbe.MeasureRows("Assets/.../01_home.png", 1f / 3f, new Vector2Int(5, 900));
+Quang.UI.Editor.ResponsivePreview.Render("Assets/.../CanvasHome.prefab", "Assets/.../UIManager.prefab", outDir);
+```
 
 ---
 
